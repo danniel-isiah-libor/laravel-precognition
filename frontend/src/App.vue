@@ -1,17 +1,52 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <form @submit.prevent="submit">
+    <label for="name">Name</label>
+    <input id="name" v-model="form.name" @change="form.validate('name')" />
+    <div v-if="form.invalid('name')">
+      {{ form.errors.name }}
+    </div>
+
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      v-model="form.email"
+      @change="form.validate('email')"
+    />
+    <div v-if="form.invalid('email')">
+      {{ form.errors.email }}
+    </div>
+
+    <button :disabled="form.processing">Create User</button>
+  </form>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { useForm } from "laravel-precognition-vue";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  name: "App",
+  data() {
+    return {
+      form: useForm("post", "http://localhost:8000/api/test", {
+        name: "",
+        email: "",
+      }),
+    };
+  },
+  methods: {
+    async submit() {
+      await this.form
+        .submit()
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
 </script>
 
 <style>
